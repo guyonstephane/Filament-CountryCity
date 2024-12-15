@@ -4,11 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers;
+use App\Filament\Resources\CountryResource\RelationManagers\CitiesRelationManager;
 use App\Models\City;
 use App\Models\Country;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -41,10 +45,13 @@ class CountryResource extends Resource
                 Forms\Components\TextInput::make('chefEtat')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('capitale')
+                    ->formatStateUsing(fn (Country $record): string => City::find($record->capitale)->nom ?? 'no capitale')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('code')
                     ->required()
                     ->maxLength(255),
+                
+                   
             ]);
     }
 
@@ -81,6 +88,7 @@ class CountryResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                
             ])
             ->filters([
                 //
@@ -99,7 +107,7 @@ class CountryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            CitiesRelationManager::class,
         ];
     }
 
